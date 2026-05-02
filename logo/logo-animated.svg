@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 200" width="820" height="200">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&amp;display=swap');
+
+      .logo-char {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 300;
+        font-size: 148px;
+        fill: currentColor;
+        opacity: 0;
+        animation: charIn 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+      }
+
+      .tagline {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 400;
+        font-size: 17px;
+        fill: currentColor;
+        opacity: 0;
+        animation: fadeUp 0.6s ease forwards;
+        animation-delay: 1.2s;
+      }
+
+      .circle-text {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 400;
+        font-size: 10.5px;
+        fill: currentColor;
+        opacity: 0;
+        animation: fadeIn 0.4s ease forwards;
+        animation-delay: 0.8s;
+      }
+
+      .circle-ring {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 0.8;
+        opacity: 0;
+        animation: fadeIn 0.4s ease forwards;
+        animation-delay: 0.7s;
+      }
+
+      .circle-ring-inner {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 0.5;
+        opacity: 0;
+        animation: fadeIn 0.4s ease forwards;
+        animation-delay: 0.75s;
+      }
+
+      .rotating-group {
+        transform-origin: 476px 89px;
+        animation: spin 18s linear infinite;
+        animation-delay: 1s;
+      }
+
+      @keyframes charIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 0.55; }
+      }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+
+      /* hover shimmer on entire SVG */
+      .logo-char, .tagline { transition: opacity 0.3s; }
+    </style>
+
+    <!-- clip to keep things tidy -->
+    <clipPath id="logoClip">
+      <rect width="820" height="200"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#logoClip)">
+
+    <!-- ── Main wordmark ───────────────────────────── -->
+    <!-- "3" -->
+    <text class="logo-char" x="14" y="148" style="animation-delay:0.05s">3</text>
+    <!-- "p" -->
+    <text class="logo-char" x="100" y="148" style="animation-delay:0.15s">p</text>
+    <!-- "o" — hidden, circle sits here -->
+    <text class="logo-char" x="196" y="148" style="animation-delay:0.25s; opacity:0; animation: none;">o</text>
+    <!-- "n" -->
+    <text class="logo-char" x="291" y="148" style="animation-delay:0.35s">n</text>
+    <!-- "t" -->
+    <text class="logo-char" x="387" y="148" style="animation-delay:0.45s">t</text>
+    <!-- circle replaces the "o" between t and 1 -->
+    <!-- "1" -->
+    <text class="logo-char" x="552" y="148" style="animation-delay:0.65s">1</text>
+    <!-- "4" -->
+    <text class="logo-char" x="638" y="148" style="animation-delay:0.75s">4</text>
+
+    <!-- ── Animated circle (replaces the 'o' after 't') ─ -->
+    <!-- Outer ring -->
+    <circle class="circle-ring" cx="476" cy="89" r="68"/>
+    <!-- Inner ring -->
+    <circle class="circle-ring-inner" cx="476" cy="89" r="55"/>
+
+    <!-- Rotating text group -->
+    <g class="rotating-group">
+      <text class="circle-text">
+        <textPath href="#outerCirclePath" startOffset="0%">
+          3 ponto 14 · cinco três zero oito seis dois um cinco zero um zero nove dois seis ·
+        </textPath>
+      </text>
+    </g>
+
+    <!-- Path for circular text -->
+    <defs>
+      <path id="outerCirclePath"
+        d="M476,21
+           a68,68 0 1,1 -0.01,0
+           Z"/>
+    </defs>
+
+    <!-- Centre dot -->
+    <circle cx="476" cy="89" r="3.5" fill="currentColor" opacity="0"
+            style="animation: fadeIn 0.3s ease 0.9s forwards"/>
+
+    <!-- ── Tagline ───────────────────────────────────── -->
+    <text class="tagline" x="14" y="185">Centro de Estudos  •  Online e Presencial</text>
+
+  </g>
+</svg>
