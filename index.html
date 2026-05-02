@@ -18,9 +18,32 @@
   <!-- NAVBAR -->
   <header class="navbar" id="navbar">
     <div class="nav-inner">
-      <a href="#" class="logo">
-        <img src="logo/Logótipo extenso (CEOP) Branco.png"
-             alt="3Ponto14" class="logo-img" />
+      <a href="#" class="logo" aria-label="3ponto14">
+        <div class="logo-svg-wrap">
+          <span class="logo-char" style="--d:0.0s">3</span><span
+               class="logo-char" style="--d:0.08s">p</span><span
+               class="logo-char" style="--d:0.16s">o</span><span
+               class="logo-char" style="--d:0.24s">n</span><span
+               class="logo-char" style="--d:0.32s">t</span><span
+               class="logo-char logo-o-special" style="--d:0.40s">
+            <!-- Animated circle replacing the 'o' -->
+            <svg class="logo-circle-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+              <circle cx="40" cy="40" r="26" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.35"/>
+              <circle cx="40" cy="40" r="4" fill="currentColor" opacity="0.7"/>
+              <g class="circle-spin">
+                <text font-family="Montserrat, sans-serif" font-size="7.5" font-weight="400" fill="currentColor" opacity="0.65">
+                  <textPath href="#circlePathNav" startOffset="0%">3 ponto 14 · cinco três zero oito seis dois um cinco · </textPath>
+                </text>
+                <defs>
+                  <path id="circlePathNav" d="M40,6 a34,34 0 1,1 -0.001,0 Z"/>
+                </defs>
+              </g>
+            </svg>
+          </span><span
+               class="logo-char" style="--d:0.50s">1</span><span
+               class="logo-char" style="--d:0.58s">4</span>
+        </div>
       </a>
 
       <nav class="nav-links" id="navLinks">
