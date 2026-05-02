@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — 3ponto14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Blog-specific overrides ── */
+    .blog-hero {
+      background: var(--green);
+      color: var(--white);
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+    }
+    .blog-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; letter-spacing: -0.5px; }
+    .blog-hero p  { margin-top: .75rem; font-size: 1.1rem; opacity: .85; }
+
+    /* ── Grid listing ── */
+    .blog-grid {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .post-card {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      display: flex;
+      flex-direction: column;
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+      cursor: pointer;
+    }
+    .post-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+
+    .post-card__thumb {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .post-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .post-card__thumb-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg, var(--green-pale) 0%, var(--blush-pale) 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .post-card__thumb-placeholder span {
+      font-size: 3rem; opacity: .35;
+    }
+
+    .post-card__body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+    .post-card__meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .75rem; }
+    .post-card__date { font-size: .78rem; color: var(--gray); }
+    .post-card__cat {
+      font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      background: var(--green-pale); color: var(--green); padding: .2rem .6rem; border-radius: 20px;
+    }
+    .post-card__title { font-size: 1.05rem; font-weight: 700; line-height: 1.4; color: var(--dark); margin-bottom: .6rem; }
+    .post-card__excerpt { font-size: .88rem; color: var(--gray); line-height: 1.65; flex: 1; }
+    .post-card__link {
+      display: inline-block; margin-top: 1.2rem;
+      font-size: .82rem; font-weight: 600; color: var(--green);
+      text-decoration: none; letter-spacing: .03em;
+      transition: color .2s;
+    }
+    .post-card__link:hover { color: var(--blush-mid); }
+
+    /* ── Individual post overlay ── */
+    .post-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(26,26,26,.55); backdrop-filter: blur(4px);
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 1.5rem; overflow-y: auto;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s var(--ease);
+    }
+    .post-overlay.open { opacity: 1; pointer-events: all; }
+
+    .post-modal {
+      background: var(--white); border-radius: 20px;
+      max-width: 780px; width: 100%;
+      padding: 2.5rem 2.5rem 3rem;
+      margin: auto;
+      transform: translateY(30px);
+      transition: transform .35s var(--ease);
+      position: relative;
+    }
+    .post-overlay.open .post-modal { transform: translateY(0); }
+
+    .post-modal__close {
+      position: absolute; top: 1.2rem; right: 1.4rem;
+      background: var(--green-pale); border: none; cursor: pointer;
+      width: 36px; height: 36px; border-radius: 50%;
+      font-size: 1.2rem; color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .post-modal__close:hover { background: var(--blush-pale); }
+
+    .post-modal__hero-img {
+      width: 100%; border-radius: 12px; margin-bottom: 1.8rem; display: block;
+      aspect-ratio: 16/9; object-fit: cover;
+    }
+    .post-modal__meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+    .post-modal__date { font-size: .8rem; color: var(--gray); }
+    .post-modal__cat {
+      font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      background: var(--green-pale); color: var(--green); padding: .2rem .6rem; border-radius: 20px;
+    }
+    .post-modal h1 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; color: var(--dark); line-height: 1.3; margin-bottom: 1.4rem; }
+    .post-modal__content { font-size: .97rem; line-height: 1.85; color: var(--dark-2); }
+    .post-modal__content h2 { font-size: 1.2rem; font-weight: 700; color: var(--green); margin: 1.8rem 0 .6rem; }
+    .post-modal__content h3 { font-size: 1rem; font-weight: 600; color: var(--dark); margin: 1.4rem 0 .4rem; }
+    .post-modal__content p  { margin-bottom: 1rem; }
+    .post-modal__content ul, .post-modal__content ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+    .post-modal__content li { margin-bottom: .4rem; }
+    .post-modal__content strong { color: var(--dark); }
+    .post-modal__content blockquote {
+      border-left: 3px solid var(--blush-mid); padding-left: 1rem;
+      color: var(--gray); font-style: italic; margin: 1rem 0;
+    }
+    .post-modal__source {
+      display: inline-block; margin-top: 2rem;
+      font-size: .8rem; color: var(--gray);
+      text-decoration: none; border-bottom: 1px dashed var(--gray-light);
+    }
+    .post-modal__source:hover { color: var(--green); }
+
+    /* ── Back to top / nav ── */
+    .blog-back {
+      display: inline-flex; align-items: center; gap: .5rem;
+      color: var(--white); font-size: .88rem; font-weight: 600;
+      text-decoration: none; opacity: .85; transition: opacity .2s;
+      margin-bottom: 1.5rem;
+    }
+    .blog-back:hover { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .post-modal { padding: 1.5rem 1.2rem 2rem; }
+      .blog-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ HERO -->
+<section class="blog-hero">
+  <a href="index.html" class="blog-back">&#8592; Voltar ao site</a>
+  <h1>Blog 3ponto14</h1>
+  <p>Recursos, reflexões e dicas para pais, alunos e educadores.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════ GRID -->
+<main class="blog-grid" id="blog-grid">
+
+  <!-- POST 1 -->
+  <article class="post-card" onclick="openPost('post1')">
+    <div class="post-card__thumb-placeholder"><span>📖</span></div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">7 de abril de 2026</span>
+      </div>
+      <h2 class="post-card__title">Estudar Online ou Presencial: Qual é Realmente Melhor para o Teu Filho?</h2>
+      <p class="post-card__excerpt">Não existe uma resposta única — depende do aluno, da família e da qualidade de quem ensina. Descobre como decidir.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 2 -->
+  <article class="post-card" onclick="openPost('post2')">
+    <div class="post-card__thumb-placeholder"><span>💻</span></div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">7 de abril de 2026</span>
+        <span class="post-card__cat">Ensino online</span>
+        <span class="post-card__cat">Centro de estudos</span>
+      </div>
+      <h2 class="post-card__title">Centro de Estudos Online: Funciona ou é sinónimo de mais distração?</h2>
+      <p class="post-card__excerpt">Um centro de estudos online funciona como um presencial mas a partir de casa — com professores qualificados e apoio personalizado em tempo real.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 3 -->
+  <article class="post-card" onclick="openPost('post3')">
+    <div class="post-card__thumb-placeholder"><span>📋</span></div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">26 de dezembro de 2025</span>
+        <span class="post-card__cat">Centro de estudos</span>
+      </div>
+      <h2 class="post-card__title">Fim do primeiro período: balanço e aconselhamento parental</h2>
+      <p class="post-card__excerpt">O fim do período traz alívio e preocupação a muitas famílias. Como interpretar os resultados e agir de forma construtiva?</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 4 -->
+  <article class="post-card" onclick="openPost('post4')">
+    <div class="post-card__thumb-placeholder"><span>🎄</span></div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">26 de dezembro de 2025</span>
+      </div>
+      <h2 class="post-card__title">Estudar nas férias de Natal: sim ou não?</h2>
+      <p class="post-card__excerpt">Uma análise equilibrada para pais e alunos que enfrentam a decisão de estudar ou descansar durante as férias de Natal.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 5 -->
+  <article class="post-card" onclick="openPost('post5')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/10/homeschooling-5121262_1280-1-1024x682.jpg" alt="Da emergência à excelência" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">24 de outubro de 2025</span>
+        <span class="post-card__cat">Ensino online</span>
+        <span class="post-card__cat">Estudo Presencial</span>
+      </div>
+      <h2 class="post-card__title">Da emergência à excelência: como o digital mudou as explicações</h2>
+      <p class="post-card__excerpt">Desde o fecho das escolas em 2020, o ensino digital transformou-se de medida de emergência em alternativa estruturada e eficaz.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 6 -->
+  <article class="post-card" onclick="openPost('post6')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/09/blog-studying-2.jpg" alt="Estudar bem" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">16 de setembro de 2025</span>
+      </div>
+      <h2 class="post-card__title">O seu filho estuda muito… mas será que estuda bem?</h2>
+      <p class="post-card__excerpt">Horas de estudo não garantem resultados. O que realmente conta é o método — e a ciência já sabe quais funcionam.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 7 -->
+  <article class="post-card" onclick="openPost('post7')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/07/quando-e-que-as-criancas-devem-comecar-a-ler-e-como-criar-o-gosto-pela-leitura-1.jpg" alt="Ler em voz alta" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">15 de julho de 2025</span>
+      </div>
+      <h2 class="post-card__title">O meu filho quer ler em voz alta. Está algo de errado?</h2>
+      <p class="post-card__excerpt">Ler em voz alta é uma prática natural e benéfica no desenvolvimento infantil. A ciência explica porquê — e como aproveitar ao máximo.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 8 -->
+  <article class="post-card" onclick="openPost('post8')">
+    <div class="post-card__thumb-placeholder"><span>🌍</span></div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">29 de maio de 2025</span>
+      </div>
+      <h2 class="post-card__title">O que podemos aprender com a educação do estrangeiro?</h2>
+      <p class="post-card__excerpt">Finlândia, Japão, Singapura, Estónia… o que têm de especial estes sistemas educativos e o que Portugal pode aprender com eles?</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 9 -->
+  <article class="post-card" onclick="openPost('post9')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/05/Photogenica-PHX250176254-1.jpg" alt="Elogiar o filho" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">7 de maio de 2025</span>
+      </div>
+      <h2 class="post-card__title">Elogie o seu Filho se Quer um Melhor Desempenho Escolar</h2>
+      <p class="post-card__excerpt">A forma como elogiamos os filhos influencia diretamente a sua motivação, resiliência e desempenho académico. Aprenda a elogiar bem.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 10 -->
+  <article class="post-card" onclick="openPost('post10')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/03/shutterstock_2092730650-1024x683.jpg" alt="Cérebro e aprendizagem" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">26 de março de 2025</span>
+      </div>
+      <h2 class="post-card__title">O Cérebro e a Aprendizagem: como se aprende?</h2>
+      <p class="post-card__excerpt">Entender como o cérebro processa e retém informação pode mudar completamente a forma como o teu filho estuda.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 11 -->
+  <article class="post-card" onclick="openPost('post11')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/03/What-Are-Learning-Differences-1024x640.jpg" alt="Aprender a aprender" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">11 de março de 2025</span>
+      </div>
+      <h2 class="post-card__title">Aprender a Aprender: Como Aprender de Verdade</h2>
+      <p class="post-card__excerpt">Saber estudar é uma competência essencial — e ensinável. Descobre as estratégias baseadas na ciência que realmente funcionam.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 12 -->
+  <article class="post-card" onclick="openPost('post12')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/02/image-1024x512.png" alt="Educação além dos livros" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">25 de fevereiro de 2025</span>
+      </div>
+      <h2 class="post-card__title">Educação além dos livros: as habilidades essenciais</h2>
+      <p class="post-card__excerpt">As competências mais valorizadas no futuro vão muito além da literacia e da matemática. Que habilidades devemos cultivar nos nossos filhos?</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 13 -->
+  <article class="post-card" onclick="openPost('post13')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/02/GettyImages-517751240-1024x697-1.jpg" alt="Coisas inúteis na escola" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">11 de fevereiro de 2025</span>
+      </div>
+      <h2 class="post-card__title">Para que é que os meus filhos aprendem coisas inúteis?</h2>
+      <p class="post-card__excerpt">O Teorema de Pitágoras, a história dos descobrimentos… Para que serve tudo isso? Uma resposta honesta a uma dúvida legítima dos pais.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 14 -->
+  <article class="post-card" onclick="openPost('post14')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/01/image-1.png" alt="Sucesso escolar sem ajuda" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">22 de janeiro de 2025</span>
+      </div>
+      <h2 class="post-card__title">Sucesso escolar sem ajuda… Não está tudo perdido!</h2>
+      <p class="post-card__excerpt">Não ter acesso a explicações ou centros de estudo não significa que o sucesso académico seja impossível. Descobre como.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 15 -->
+  <article class="post-card" onclick="openPost('post15')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2025/01/47867WideModern_homework_093013.jpg" alt="Trabalhos de casa" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">6 de janeiro de 2025</span>
+      </div>
+      <h2 class="post-card__title">Fazer os Trabalhos de Casa sem nos chatearmos</h2>
+      <p class="post-card__excerpt">Os TPCs são fonte de conflito em muitas famílias. Com as estratégias certas, podem tornar-se um momento de ligação e crescimento.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 16 -->
+  <article class="post-card" onclick="openPost('post16')">
+    <div class="post-card__thumb">
+      <img src="https://3ponto14.com/wp-content/uploads/2024/11/istock-586379824_custom-31aa5fe9e1126ecb0ec576fbb78b942c1f4e4f13-1024x683.jpg" alt="Autonomia num centro de estudos" loading="lazy" />
+    </div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">4 de dezembro de 2024</span>
+      </div>
+      <h2 class="post-card__title">Ser autónomo… estando num centro de estudos?</h2>
+      <p class="post-card__excerpt">Apoio externo e autonomia não se excluem. Descobre como um centro de estudos pode, afinal, tornar o teu filho mais independente.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+  <!-- POST 17 -->
+  <article class="post-card" onclick="openPost('post17')">
+    <div class="post-card__thumb-placeholder"><span>👩‍🏫</span></div>
+    <div class="post-card__body">
+      <div class="post-card__meta">
+        <span class="post-card__date">26 de novembro de 2024</span>
+      </div>
+      <h2 class="post-card__title">A nossa equipa</h2>
+      <p class="post-card__excerpt">Quem somos, o que nos move e porque criámos o 3ponto14. Conhece as fundadoras Ana e Joana e toda a equipa.</p>
+      <span class="post-card__link">Ler artigo →</span>
+    </div>
+  </article>
+
+</main>
+
+<!-- ═══════════════════════════════════════════ OVERLAY / MODAL -->
+<div class="post-overlay" id="post-overlay" onclick="closePostOnBg(event)">
+  <div class="post-modal" id="post-modal">
+    <button class="post-modal__close" onclick="closePost()" aria-label="Fechar">✕</button>
+    <div id="post-modal__inner"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ POST DATA -->
+<script>
+const posts = {
+
+  post1: {
+    title: "Estudar Online ou Presencial: Qual é Realmente Melhor para o Teu Filho?",
+    date: "7 de abril de 2026",
+    cats: [],
+    img: "",
+    url: "https://3ponto14.com/estudar-online-ou-presencial-qual-e-realmente-melhor-para-o-teu-filho/",
+    content: `
+      <p>Não existe uma resposta única para saber se o ensino online ou presencial é melhor. Os fatores realmente determinantes são <strong>a qualidade de quem ensina e a regularidade com que se estuda</strong>.</p>
+
+      <h2>O Mito do Online como Opção Secundária</h2>
+      <p>Uma análise do Departamento de Educação dos EUA que revisou mais de 1 000 estudos concluiu que alunos em programas online bem estruturados obtiveram resultados iguais ou ligeiramente superiores aos do ensino presencial. A personalização é a chave do sucesso online.</p>
+
+      <h2>O que o Ensino Presencial Oferece</h2>
+      <ul>
+        <li>Separação física entre casa e espaço de estudo — o contexto mental muda.</li>
+        <li>Energia de grupo e motivação ao estudar com colegas.</li>
+        <li>Dimensão relacional, especialmente valiosa para alunos mais novos.</li>
+      </ul>
+
+      <h2>O que o Ensino Online Oferece</h2>
+      <ul>
+        <li>Flexibilidade de horário para famílias com rotinas irregulares.</li>
+        <li>Acessibilidade geográfica — elimina desigualdades regionais em Portugal.</li>
+        <li>Redução de ansiedade para alunos que sentem dificuldade em contexto de sala de aula.</li>
+      </ul>
+
+      <h2>Dados de Investigação</h2>
+      <p>Em Portugal, a adoção de plataformas de estudo online cresceu 180 % entre 2019 e 2023. Um estudo da Universidade de Stanford de 2023 sobre programas de tutoria personalizada demonstrou maior consistência nos formatos online.</p>
+
+      <h2>Como Decidir?</h2>
+      <p>Faz as perguntas certas: o teu filho precisa de estrutura física? Tem dificuldade em gerir distrações em casa? Existe um bom professor disponível na vossa zona? A resposta a estas questões vai orientar a melhor escolha.</p>
+
+      <h2>Perguntas Frequentes</h2>
+      <ul>
+        <li><strong>A partir de que idade faz sentido o apoio online?</strong> Em geral, a partir do 3.º ano de escolaridade.</li>
+        <li><strong>Como se monitoriza a evolução?</strong> Através de relatórios regulares e comunicação com o professor.</li>
+        <li><strong>Em quanto tempo se veem resultados?</strong> Tipicamente entre 6 a 10 semanas de trabalho regular.</li>
+      </ul>
+    `
+  },
+
+  post2: {
+    title: "Centro de Estudos Online: Funciona ou é sinónimo de mais distração?",
+    date: "7 de abril de 2026",
+    cats: ["Ensino online", "Centro de estudos", "Estudo Presencial"],
+    img: "",
+    url: "https://3ponto14.com/centro-de-estudos-online-funciona-ou-e-sinonimo-de-mais-distracao/",
+    content: `
+      <p>Um centro de estudos online funciona como um centro presencial, mas em formato digital: <em>"o aluno pode aceder a qualquer ponto do país sem sair de casa."</em> Ao contrário das plataformas de vídeo gravado, este modelo tem professores em tempo real que adaptam as explicações a cada aluno.</p>
+
+      <h2>Como Funciona?</h2>
+      <ul>
+        <li>Fase de diagnóstico para identificar as necessidades do aluno.</li>
+        <li>Sessões ao vivo via Zoom com partilha de ecrã.</li>
+        <li>Acesso 24h a materiais e esclarecimento de dúvidas.</li>
+        <li>Horário flexível combinado entre professor e aluno.</li>
+      </ul>
+
+      <h2>Perfis de Alunos Ideais</h2>
+      <ul>
+        <li>Alunos em zonas geográficas remotas.</li>
+        <li>Horários exigentes (desporto de competição, conservatório).</li>
+        <li>Preparação para exames nacionais.</li>
+        <li>Ansiedade em contexto de sala de aula tradicional.</li>
+        <li>Necessidade de ritmo personalizado.</li>
+      </ul>
+
+      <h2>Online vs. Presencial</h2>
+      <p>Um estudo de Stanford de 2023 indica que <em>"alunos em programas de tutoria online personalizada mostraram melhorias de desempenho comparáveis"</em> à tutoria presencial.</p>
+
+      <h2>Perguntas Frequentes</h2>
+      <ul>
+        <li><strong>Que equipamento é necessário?</strong> Computador ou tablet com câmara e microfone.</li>
+        <li><strong>A partir de que ano faz sentido?</strong> Em geral, a partir do 3.º ano.</li>
+        <li><strong>Existe período experimental?</strong> No 3ponto14 há 5 dias gratuitos.</li>
+      </ul>
+
+      <p><strong>Contacto:</strong> 3ponto14edu@gmail.com | +351 912 381 996</p>
+    `
+  },
+
+  post3: {
+    title: "Fim do primeiro período: balanço e aconselhamento parental",
+    date: "26 de dezembro de 2025",
+    cats: ["Centro de estudos"],
+    img: "",
+    url: "https://3ponto14.com/fim-do-primeiro-periodo-balanco-e-aconselhamento-parental/",
+    content: `
+      <p>O fim do período traz alívio e, muitas vezes, preocupação. As notas são apenas uma parte da história — a evolução pode ocorrer antes de se refletir nas classificações.</p>
+
+      <h2>As Notas Não Dizem Tudo</h2>
+      <p>As classificações representam apenas uma parte do progresso do aluno. Há competências em desenvolvimento que ainda não aparecem no boletim.</p>
+
+      <h2>Qualidade vs. Quantidade de Estudo</h2>
+      <p>Muitos pais interrogam-se porque é que o filho estuda horas a fio sem ver resultados. A resposta está no método: <strong>nem todas as disciplinas se estudam da mesma forma</strong>, e os métodos de aprendizagem ativa superam a memorização passiva.</p>
+
+      <h2>Rotinas de Estudo</h2>
+      <p>A abordagem mais eficaz é colaborativa: envolver os alunos na criação dos horários reduz conflitos e aumenta o comprometimento.</p>
+
+      <h2>Preparação para Testes</h2>
+      <p>O planeamento estratégico distribui o estudo por vários dias — em vez de concentrar tudo na véspera.</p>
+
+      <h2>Motivação e Bem-estar</h2>
+      <p>Os alunos precisam de perceber a ligação entre o que aprendem e os seus interesses. Sinais persistentes de stress e ansiedade devem ser levados a sério pelos pais.</p>
+
+      <h2>Enquadramento Científico</h2>
+      <p>A teoria da autodeterminação e investigações recentes mostram que o envolvimento parental positivo se correlaciona com melhores resultados académicos e maior motivação intrínseca.</p>
+    `
+  },
+
+  post4: {
+    title: "Estudar nas férias de Natal: sim ou não?",
+    date: "26 de dezembro de 2025",
+    cats: [],
+    img: "",
+    url: "https://3ponto14.com/estudar-nas-ferias-de-natal-sim-ou-nao-uma-analise-equilibrada-para-pais-e-alunos/",
+    content: `
+      <h2>A perspetiva de quem defende estudar nas férias</h2>
+
+      <h3>1. Recuperar dificuldades acumuladas</h3>
+      <p>Se o primeiro período correu menos bem, as férias podem ser uma oportunidade para reorganizar cadernos, rever matérias e consolidar bases. A psicopedagoga Mariana Bruno Chaves sublinha que <em>"a continuidade dos estudos, com atividades diárias de cerca de 30 minutos, ajuda a reter o que foi aprendido."</em></p>
+
+      <h3>2. Preparar avaliações no regresso</h3>
+      <p>Em muitas escolas, janeiro começa com testes logo na primeira ou segunda semana. Uma revisão leve nas férias pode reduzir a ansiedade e dar segurança ao aluno.</p>
+
+      <h3>3. Manter ritmo e consistência</h3>
+      <p>A doutora em Educação Sonia Radvanskei recorda que <em>"as férias oferecem uma excelente oportunidade para ensinar às crianças sobre organização e disciplina."</em></p>
+
+      <h2>A perspetiva de quem defende a pausa total</h2>
+
+      <h3>1. O cérebro precisa de descanso verdadeiro</h3>
+      <p>Depois de três meses de aulas, os alunos chegam a dezembro cansados. As férias proporcionam o período de descanso necessário para recarregar energias.</p>
+
+      <h3>2. A pausa melhora a memória e a concentração</h3>
+      <p>Noites de sono mais longas restauram energias e favorecem o equilíbrio emocional, melhorando a consolidação de memória a longo prazo.</p>
+
+      <h3>3. Férias são essenciais para o bem-estar emocional</h3>
+      <p>O Natal é um momento de família, afeto e pausa que promove o desenvolvimento infantil saudável.</p>
+
+      <h2>A posição do 3ponto14</h2>
+      <p>No 3ponto14 seguimos uma regra simples: <strong>Em regra, nas férias de Natal não se deve estudar.</strong></p>
+
+      <h3>Quando o trabalho foi bem feito ao longo do período</h3>
+      <p>Se o aluno se organizou e acompanhou a matéria, as férias devem ser férias — com apenas uma revisão leve nos últimos dias antes do regresso.</p>
+
+      <h3>Quando houve dificuldades acumuladas</h3>
+      <p>Se o aluno ficou para trás, sessões curtas e objetivas podem evitar que as dificuldades cresçam em janeiro — sem roubar o descanso merecido.</p>
+
+      <h2>Conclusão</h2>
+      <p><strong>Sim</strong>, se o aluno teve dificuldades significativas: máximo 30 minutos por dia, em dias alternados.<br/>
+      <strong>Não</strong>, se o trabalho foi bem feito: férias genuínas para família, descanso e recarregar energias.</p>
+    `
+  },
+
+  post5: {
+    title: "Da emergência à excelência: como o digital mudou as explicações",
+    date: "24 de outubro de 2025",
+    cats: ["Ensino online", "Estudo Presencial"],
+    img: "https://3ponto14.com/wp-content/uploads/2025/10/homeschooling-5121262_1280-1-1024x682.jpg",
+    url: "https://3ponto14.com/da-emergencia-a-excelencia-como-o-digital-mudou-as-explicacoes/",
+    content: `
+      <p>Quando as escolas fecharam em março de 2020, milhões de alunos em todo o mundo transitaram para o ensino virtual. O que parecia temporário tornou-se revolucionário.</p>
+
+      <h2>A Porta de Entrada Digital da Pandemia</h2>
+      <p>Segundo o Fórum Económico Mundial, <em>"mais de 1,2 mil milhões de alunos, em 186 países, tiveram aulas online durante os períodos de confinamento."</em> Os professores portugueses adaptaram-se rapidamente, usando Zoom, Google Meet e Microsoft Teams.</p>
+      <p>A experiência forçada revelou vantagens: alguns alunos participaram com mais conforto — especialmente os mais tímidos. Outros geriram melhor o tempo e estudaram em ambientes confortáveis, sem tempo de deslocação.</p>
+
+      <h2>Vantagens do Ensino Online</h2>
+      <p>A tutoria à distância oferece flexibilidade e autonomia — fatores críticos para o sucesso académico. As sessões ocorrem em qualquer lugar, os materiais ficam acessíveis para revisão posterior e a tecnologia elimina barreiras geográficas: alunos do interior acedem a professores de Lisboa, Porto ou até internacionais.</p>
+      <p>Investigação publicada na <em>BMC Medical Education</em> (2021) demonstra que <em>"o desempenho dos alunos em contexto online igualou ou superou o equivalente presencial"</em>, com monitorização próxima e infraestrutura tecnológica adequada.</p>
+
+      <h2>O Valor Insubstituível do Presencial</h2>
+      <p>No entanto, algo permanece irrepetível online: a presença humana. O ensino presencial oferece empatia, linguagem corporal e observação atenta que as plataformas não conseguem replicar. Os centros de estudo criam um ambiente diferente — sair de casa, dedicar um espaço ao estudo e remover distrações digitais estabelece disciplina e rotina.</p>
+
+      <h2>Semelhanças, Diferenças e o Futuro Híbrido</h2>
+      <p>Ambos os modelos partilham o mesmo objetivo: ajudar os alunos a aprender e a ganhar confiança. A distinção está nos métodos de entrega. O presencial oferece componentes socio-emocionais mais fortes; o online oferece flexibilidade e personalização.</p>
+      <p>Nenhum exige exclusão do outro. Crescentemente, os centros adotam modelos híbridos: sessões intensivas presenciais para preparação de exames, combinadas com revisões online para dúvidas rápidas e apoio contínuo.</p>
+
+      <h2>Conclusão</h2>
+      <p>A COVID-19 transformou a forma de ensinar e aprender. O online provou a eficácia do ensino à distância; o presencial reafirmou a insubstituibilidade da conexão humana. O futuro da educação combina provavelmente ambos — porque <em>"não é a plataforma que ensina. São as pessoas."</em></p>
+    `
+  },
+
+  post6: {
+    title: "O seu filho estuda muito… mas será que estuda bem?",
+    date: "16 de setembro de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/09/blog-studying-2.jpg",
+    url: "https://3ponto14.com/o-seu-filho-estuda-muito-mas-sera-que-estuda-bem/",
+    content: `
+      <p>Muitos alunos passam horas a estudar sem obter resultados proporcionais. A razão? Os métodos tradicionais — como reler e sublinhar em excesso — são cientificamente ineficazes.</p>
+
+      <h2>O que a Ciência Diz</h2>
+      <p>Dunlosky et al. (2013) identificaram quatro estratégias baseadas em evidências:</p>
+      <ul>
+        <li><strong>Prática distribuída:</strong> estudar ao longo do tempo em vez de concentrar tudo numa sessão.</li>
+        <li><strong>Auto-testagem:</strong> testar os próprios conhecimentos em vez de reler passivamente.</li>
+        <li><strong>Envolvimento ativo:</strong> interagir com o material, não apenas consumi-lo.</li>
+        <li><strong>Reflexão sobre lacunas:</strong> identificar o que ainda não se sabe.</li>
+      </ul>
+
+      <h2>Técnicas Práticas</h2>
+      <ul>
+        <li><strong>Método Pomodoro:</strong> blocos de 25-30 minutos de foco com pausas.</li>
+        <li><strong>Repetição Espaçada:</strong> rever o conteúdo ao longo de vários dias.</li>
+        <li><strong>Prática de Recuperação:</strong> testar-se sem consultar os apontamentos.</li>
+        <li><strong>Intercalação:</strong> misturar diferentes disciplinas numa sessão.</li>
+        <li><strong>Auto-Explicação:</strong> ensinar o conteúdo em voz alta ou por escrito.</li>
+      </ul>
+
+      <h2>O Papel dos Pais</h2>
+      <p>Em vez de exigir resultados, os pais devem criar ambientes livres de distrações, ajudar a planear sessões de estudo distribuídas, encorajar a aprendizagem ativa através de perguntas e celebrar o progresso.</p>
+    `
+  },
+
+  post7: {
+    title: "O meu filho quer ler em voz alta. Está algo de errado?",
+    date: "15 de julho de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/07/quando-e-que-as-criancas-devem-comecar-a-ler-e-como-criar-o-gosto-pela-leitura-1.jpg",
+    url: "https://3ponto14.com/o-meu-filho-quer-ler-em-voz-alta-esta-algo-de-errado/",
+    content: `
+      <p>A resposta é decididamente positiva: ler em voz alta serve múltiplos propósitos no desenvolvimento infantil. Não há nada de errado — bem pelo contrário.</p>
+
+      <h2>Ligação Emocional</h2>
+      <p>Ler em voz alta cria momentos de ligação entre adulto e criança, comunicando: <em>"este tempo é só nosso."</em></p>
+
+      <h2>Suporte Científico</h2>
+      <p>A Academia Americana de Pediatria recomenda a prática desde a infância. Uma investigação da Universidade de Melbourne que acompanhou mais de 4 000 crianças concluiu que as expostas regularmente à leitura em voz alta demonstraram <em>"melhores resultados em vocabulário, compreensão oral, expressão escrita e raciocínio lógico-matemático."</em></p>
+
+      <h2>Desenvolvimento da Empatia</h2>
+      <p>Ouvir histórias ajuda as crianças a compreender emoções e a desenvolver a capacidade de se colocarem no lugar do outro.</p>
+
+      <h2>Benefícios Além da Leitura Independente</h2>
+      <p>Mesmo as crianças que já leem autonomamente beneficiam de ser lidas em voz alta: acesso a vocabulário mais rico e fortalecimento do vínculo com o adulto.</p>
+
+      <h2>Como Implementar</h2>
+      <p>A consistência importa mais do que a duração — 10 a 15 minutos diários fazem diferença. A leitura pode acontecer naturalmente antes de dormir, durante momentos de descanso ou em viagens de carro.</p>
+    `
+  },
+
+  post8: {
+    title: "O que podemos aprender com a educação do estrangeiro?",
+    date: "29 de maio de 2025",
+    cats: [],
+    img: "",
+    url: "https://3ponto14.com/o-que-podemos-aprender-com-a-educacao-do-estrangeiro/",
+    content: `
+      <h2>Finlândia: Menos testes, mais confiança</h2>
+      <p>O sistema finlandês privilegia a avaliação personalizada em detrimento de testes estandardizados. Os alunos experienciam menos ansiedade, mais confiança e um ambiente onde aprender — e não apenas obter notas — é valorizado. O tempo de recreio e as pausas são prioritários como parte de uma filosofia que acredita que crianças felizes aprendem melhor.</p>
+
+      <h2>Países Baixos: Escolhas desde cedo e ensino prático</h2>
+      <p>As escolas holandesas incentivam a descoberta precoce das paixões dos alunos, com percursos educativos flexíveis e personalizados. O foco está em desenvolver competências práticas — pensamento crítico, resolução de problemas e empreendedorismo — em vez da memorização.</p>
+
+      <h2>Estónia: A força da tecnologia</h2>
+      <p>A Estónia integra a literacia digital desde cedo, com programação no currículo e conteúdos adaptados ao online. A tecnologia serve como ferramenta de inclusão e acessibilidade, não como novidade.</p>
+
+      <h2>Singapura: Bons professores fazem bons alunos</h2>
+      <p>Os professores recebem formação contínua, remuneração competitiva e oportunidades de liderança. Este investimento traduz-se em desempenho de topo global em literacia, matemática e ciências, a par do desenvolvimento de competências socio-emocionais.</p>
+
+      <h2>Suíça: Aprender com a vida real</h2>
+      <p>O modelo de educação dual combina aprendizagem em sala de aula com estágios profissionais, unindo teoria e prática de forma eficaz.</p>
+
+      <h2>Japão: Educar além dos livros</h2>
+      <p>A educação para o caráter precede o foco académico, enfatizando responsabilidade e comunidade. A limpeza das salas de aula pelos alunos constrói hábitos de respeito para a vida.</p>
+
+      <h2>Canadá: Diversidade e inclusão na prática</h2>
+      <p>O design curricular descentralizado permite adaptação local e inclusão cultural, preparando os alunos para ambientes profissionais multiculturais.</p>
+
+      <h2>O que Portugal pode aprender</h2>
+      <ul>
+        <li>Personalização do ritmo de aprendizagem.</li>
+        <li>Valorização e apoio aos professores.</li>
+        <li>Integração do mundo real no ensino.</li>
+        <li>Prioridade à educação emocional.</li>
+      </ul>
+    `
+  },
+
+  post9: {
+    title: "Elogie o seu Filho se Quer um Melhor Desempenho Escolar",
+    date: "7 de maio de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/05/Photogenica-PHX250176254-1.jpg",
+    url: "https://3ponto14.com/elogie-o-seu-filho-se-quer-um-melhor-desempenho-escolar/",
+    content: `
+      <p>A forma como elogiamos os filhos influencia diretamente a sua motivação, resiliência e desempenho académico. Investigação indica que <em>"crianças elogiadas pelo esforço tendem a ser mais persistentes, resilientes e abertas a novos desafios"</em> — ao contrário do elogio focado na inteligência, que pode criar medo do fracasso.</p>
+
+      <h2>Como Elogiar de Forma Construtiva</h2>
+      <p>O elogio eficaz é específico, sincero e orientado para o processo — não para o resultado. Em vez de comentários genéricos, o feedback deve ser detalhado. Comparações com colegas devem ser evitadas; o foco deve estar no progresso individual.</p>
+
+      <h2>Frases que Funcionam</h2>
+      <ul>
+        <li>"Estou orgulhoso do teu esforço."</li>
+        <li>"Acredito na tua capacidade de superar este desafio."</li>
+        <li>"Errar faz parte do processo de aprendizagem."</li>
+        <li>"O importante é que estás a dar o teu melhor."</li>
+      </ul>
+
+      <h2>O Papel dos Pais e Educadores</h2>
+      <p>Pais e professores são fundamentais na construção da autoestima das crianças através de elogios construtivos, desenvolvendo alunos confiantes e motivados.</p>
+
+      <h2>Mudar a Mentalidade Começa em Casa</h2>
+      <p>A educação emocional começa em casa. Criar ambientes onde os erros apoiam o crescimento — em vez de gerar vergonha — ajuda as crianças a desenvolver uma relação mais saudável com a aprendizagem e uma autoestima mais sólida.</p>
+    `
+  },
+
+  post10: {
+    title: "O Cérebro e a Aprendizagem: como se aprende?",
+    date: "26 de março de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/03/shutterstock_2092730650-1024x683.jpg",
+    url: "https://3ponto14.com/o-cerebro-e-a-aprendizagem-como-se-aprende/",
+    content: `
+      <p>Aprender pode parecer algo natural, mas o que acontece no cérebro durante esse processo é verdadeiramente incrível. Saber como funciona este "motor do conhecimento" pode fazer toda a diferença na forma como os pais ajudam os filhos a estudar.</p>
+
+      <h2>O Que se Passa no Cérebro Quando Aprendemos?</h2>
+      <ul>
+        <li><strong>Hipocampo:</strong> Funciona como um "bloco de notas" onde a informação recente é armazenada. Revisões espaçadas reforçam as conexões neurais e solidificam as memórias (Harvard).</li>
+        <li><strong>Córtex Pré-frontal:</strong> O "diretor de orquestra" — organiza pensamentos, planeia tarefas e facilita a tomada de decisões. Estabelecer objetivos e criar rotinas aumentam significativamente a atividade nesta região (Stanford).</li>
+        <li><strong>Amígdala:</strong> As emoções influenciam bastante a aprendizagem. <em>"Ambientes positivos e desafiadores melhoram a capacidade do cérebro em codificar memórias"</em> (Yale).</li>
+      </ul>
+
+      <h2>Como a Memória se Forma</h2>
+      <ul>
+        <li><strong>Codificação:</strong> O cérebro recebe informação e determina o que é importante. Repetir em diferentes formatos — explicar verbalmente ou criar mapas mentais — facilita esta etapa.</li>
+        <li><strong>Armazenamento:</strong> Com revisões regulares, a informação fixa-se na memória de longo prazo. <em>"Revisões espaçadas são uma das formas mais eficazes de consolidar memórias"</em> (<em>Psychological Science</em>).</li>
+        <li><strong>Recuperação:</strong> Estudar através de perguntas ou simulando testes melhora esta capacidade (Purdue).</li>
+      </ul>
+
+      <h2>Dicas Práticas</h2>
+      <ol>
+        <li><strong>Estudar aos poucos:</strong> sessões diárias em vez de longas maratonas na véspera.</li>
+        <li><strong>Explorar diferentes estímulos:</strong> YouTube, Escola Virtual, Kahoot.</li>
+        <li><strong>Fazer pausas:</strong> o método Pomodoro (25 min estudo + 5 min pausa) é eficaz.</li>
+        <li><strong>Ligar à vida real:</strong> matemática em descontos, geografia em viagens.</li>
+      </ol>
+
+      <h2>O Poder do Sono e das Emoções</h2>
+      <p>Dormir bem é essencial para o cérebro organizar e fixar a aprendizagem. Estudos de Freiburg indicam que <em>"uma boa noite de sono melhora a capacidade de resolver problemas e reter informação."</em> Um ambiente positivo e motivador ajuda o filho a encarar o estudo com mais confiança.</p>
+
+      <h2>Conclusão</h2>
+      <p>Com pequenas mudanças e estratégias práticas, é possível ajudar o filho a aprender de forma mais eficiente. Cada criança é única — experimente diferentes métodos até encontrar o que funciona melhor. O essencial é criar uma rotina saudável que estimule a curiosidade e o gosto por aprender.</p>
+    `
+  },
+
+  post11: {
+    title: "Aprender a Aprender: Como Aprender de Verdade",
+    date: "11 de março de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/03/What-Are-Learning-Differences-1024x640.jpg",
+    url: "https://3ponto14.com/aprender-a-aprender-como-aprender-de-verdade/",
+    content: `
+      <p>Saber estudar é uma competência essencial — e ensinável. Descobre as estratégias baseadas na ciência que realmente funcionam.</p>
+
+      <h2>Prática Espaçada</h2>
+      <p>Em vez de estudar tudo de uma vez, distribuir as sessões ao longo da semana fortalece a retenção — tal como na música ou no desporto, a prática diária supera uma sessão intensiva isolada.</p>
+
+      <h2>Recuperação Ativa</h2>
+      <p>Os alunos devem tentar recuperar informação da memória sem consultar os apontamentos. Uma boa estratégia: pedir à criança que explique o que aprendeu como se estivesse a ensinar outra pessoa — isso revela as lacunas de conhecimento.</p>
+
+      <h2>Elaboração</h2>
+      <p>Ligar novos conceitos a conhecimentos já existentes através de explicações pessoais e mapas mentais torna a aprendizagem mais significativa e memorável.</p>
+
+      <h2>Técnica Pomodoro</h2>
+      <p>25 minutos de estudo concentrado, seguidos de pausas de 5 minutos — combate a procrastinação e reduz a fadiga do estudo.</p>
+
+      <h2>Bem-estar Físico</h2>
+      <p>Sono de qualidade e exercício regular melhoram significativamente a memória, a concentração e o desempenho académico.</p>
+
+      <h2>Definição de Objetivos e Planeamento</h2>
+      <p>Objetivos claros e tarefas divididas em passos alcançáveis reduzem a ansiedade e constroem motivação progressiva.</p>
+
+      <h2>Ambiente de Estudo</h2>
+      <p>Um espaço limpo, organizado, bem iluminado e livre de distrações suporta a concentração e a produtividade.</p>
+
+      <p>A aprendizagem eficaz requer paciência, orientação e persistência.</p>
+    `
+  },
+
+  post12: {
+    title: "Educação além dos livros: as habilidades essenciais",
+    date: "25 de fevereiro de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/02/image-1024x512.png",
+    url: "https://3ponto14.com/educacao-alem-dos-livros-as-habilidades-essenciais-daqueles-que-aprendem/",
+    content: `
+      <p>A educação vai muito além das competências académicas tradicionais. As cinco habilidades mais essenciais para o sucesso futuro das crianças são:</p>
+
+      <h2>1. Pensamento Crítico e Resolução de Problemas</h2>
+      <p>Pensar de forma autónoma e resolver problemas criativamente importa tanto quanto a aritmética. Quem desenvolve esta competência interpreta melhor a informação e toma decisões mais fundamentadas.</p>
+
+      <h2>2. Comunicação e Expressão</h2>
+      <p>Saber ouvir ativamente e articular ideias com clareza é fundamental — tanto academicamente como pessoalmente. Debates, narrativas e conversas em família são práticas valiosas.</p>
+
+      <h2>3. Inteligência Emocional e Resiliência</h2>
+      <p>Gerir frustrações e emoções desde a infância correlaciona-se com melhor desempenho académico e relações interpessoais mais saudáveis.</p>
+
+      <h2>4. Autonomia e Responsabilidade</h2>
+      <p>A exposição precoce à tomada de decisões e às responsabilidades domésticas desenvolve capacidades de planeamento e resolução de problemas na vida adulta.</p>
+
+      <h2>5. Criatividade e Adaptabilidade</h2>
+      <p>Encorajar a experimentação — através do desenho, da narrativa e de abordagens variadas à resolução de problemas — desenvolve flexibilidade para as mudanças profissionais futuras.</p>
+
+      <h2>Leituras Recomendadas</h2>
+      <ul>
+        <li>Carol Dweck — <em>Mindset</em></li>
+        <li>Jane Nelsen — <em>Disciplina Positiva</em></li>
+        <li>Daniel Siegel — obras sobre desenvolvimento infantil</li>
+      </ul>
+
+      <p><strong>Contacto:</strong> 3ponto14edu@gmail.com | +351 912 381 996</p>
+    `
+  },
+
+  post13: {
+    title: "Para que é que os meus filhos aprendem coisas inúteis?",
+    date: "11 de fevereiro de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/02/GettyImages-517751240-1024x697-1.jpg",
+    url: "https://3ponto14.com/para-que-e-que-os-meus-filhos-aprendem-coisas-inuteis-na-escola/",
+    content: `
+      <p>Porque é que os filhos aprendem o Teorema de Pitágoras ou a história dos descobrimentos, se nunca vão usar isso? A resposta está em perceber que a educação vai muito além da aplicação direta dos conteúdos.</p>
+
+      <h2>Aprender a Pensar</h2>
+      <p>A escola desenvolve o raciocínio além dos factos. A matemática ensina <em>"lógica, resolução de problemas e pensamento crítico — competências fundamentais para qualquer área da vida."</em></p>
+
+      <h2>Competências Transversais</h2>
+      <p>Estudar poesia desenvolve a interpretação; as experiências de ciências ensinam a testar hipóteses. O Fórum Económico Mundial identifica o <em>"pensamento crítico, a resolução de problemas e a criatividade"</em> como as competências mais procuradas pelos empregadores.</p>
+
+      <h2>Descobrir Interesses e Talentos</h2>
+      <p>A exposição a diversas disciplinas ajuda os alunos a identificar vocações. Alunos expostos a maior diversidade de disciplinas demonstram maior flexibilidade cognitiva.</p>
+
+      <h2>Preparação para Desafios Futuros</h2>
+      <p>O mercado de trabalho evolui constantemente. Os alunos precisam de <em>"agilidade de aprendizagem e capacidade de resolução de problemas"</em> mais do que de memorização.</p>
+
+      <h2>Cultura Geral e Pensamento Crítico</h2>
+      <p>Uma educação abrangente cria cidadãos informados, capazes de <em>"interpretar criticamente as notícias e participar ativamente na sociedade."</em></p>
+
+      <h2>Conclusão</h2>
+      <p>A educação molda a forma de pensar e analisar — preparando os alunos para futuros complexos, de formas que muitas vezes só se percebem anos mais tarde.</p>
+    `
+  },
+
+  post14: {
+    title: "Sucesso escolar sem ajuda… Não está tudo perdido!",
+    date: "22 de janeiro de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/01/image-1.png",
+    url: "https://3ponto14.com/sucesso-escolar-sem-ajuda-nao-esta-tudo-perdido/",
+    content: `
+      <p>Não ter acesso a explicadores ou centros de estudo não significa que o sucesso académico seja impossível. Com o ambiente familiar certo, estratégias adequadas e envolvimento ativo, é totalmente alcançável.</p>
+
+      <h2>O Papel dos Pais e Encarregados de Educação</h2>
+      <p>Os pais são centrais para o sucesso educativo. A investigação da OCDE indica que <em>"crianças cujos pais se envolvem consistentemente na vida escolar mostram melhor desempenho académico."</em> Dicas práticas:</p>
+      <ul>
+        <li>Estabelecer rotinas equilibradas.</li>
+        <li>Mostrar interesse genuíno pelas experiências escolares.</li>
+        <li>Fomentar o diálogo sobre objetivos e dificuldades.</li>
+        <li>Celebrar os esforços — não apenas os resultados.</li>
+      </ul>
+
+      <h2>Desenvolver a Autonomia</h2>
+      <p>Ensinar independência é crucial. Uma investigação de Stanford demonstra que <em>"crianças que desenvolvem autonomia precocemente tornam-se adultos mais resilientes."</em> Estratégias:</p>
+      <ul>
+        <li>Incentivar o uso da agenda.</li>
+        <li>Ajudar a identificar prioridades.</li>
+        <li>Refletir sobre erros sem os dramatizar.</li>
+        <li>Permitir a tomada de decisões independente.</li>
+      </ul>
+
+      <h2>Quando o Apoio Externo Acrescenta Valor</h2>
+      <p>Há situações em que a tutoria profissional complementa o apoio familiar — especialmente quando há lacunas específicas de aprendizagem ou questões de motivação que precisam de atenção especializada.</p>
+
+      <h2>Leituras Recomendadas</h2>
+      <ul>
+        <li>Jesper Juul — <em>Educar para a Autonomia</em></li>
+        <li>Carol Dweck — <em>Mindset</em></li>
+        <li>Benedict Carey — <em>Como Aprendemos</em></li>
+      </ul>
+    `
+  },
+
+  post15: {
+    title: "Fazer os Trabalhos de Casa sem nos chatearmos",
+    date: "6 de janeiro de 2025",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2025/01/47867WideModern_homework_093013.jpg",
+    url: "https://3ponto14.com/fazer-tpcs-sem-chatices/",
+    content: `
+      <p>Os trabalhos de casa são essenciais para consolidar a aprendizagem — mas são também fonte de stress em muitas famílias. Com as estratégias certas, é possível transformar este momento.</p>
+
+      <h2>1. Criar um Ambiente de Estudo Favorável</h2>
+      <p>Um espaço tranquilo, organizado e bem iluminado, com um horário consistente, faz uma diferença enorme na disposição para estudar.</p>
+
+      <h2>2. Estar Disponível Sem Ser Intrusivo</h2>
+      <p><em>"Esteja disponível para esclarecer dúvidas e orientar, mas evite resolver as tarefas"</em> — o objetivo é que o aluno desenvolva a sua capacidade de resolução de problemas.</p>
+
+      <h2>3. Adotar uma Abordagem Encorajadora</h2>
+      <p>Substituir comentários desanimadores por reforço positivo constrói confiança e predisposição para o estudo.</p>
+
+      <h2>4. Ensinar Gestão do Tempo</h2>
+      <p>Ajudar os mais novos a priorizar tarefas e a dividir trabalhos complexos em passos mais pequenos reduz a sensação de sobrecarga.</p>
+
+      <h2>5. Transformar os TPCs num Momento de Ligação</h2>
+      <p>Os trabalhos de casa podem ser oportunidades de aprendizagem colaborativa em família — em vez de batalhas diárias.</p>
+
+      <h2>6. Incentivar a Autonomia Progressiva</h2>
+      <p>Apoiar os alunos no desenvolvimento de competências de resolução independente de problemas ao longo do tempo.</p>
+
+      <h2>7. Reconhecer Quando é Necessário Apoio Adicional</h2>
+      <p>Se a dinâmica familiar se tornar regularmente tensa, um apoio externo especializado pode ser a solução.</p>
+
+      <h2>Leituras Recomendadas</h2>
+      <ul>
+        <li>Pedro Huby — <em>Como Ensinar Melhor</em></li>
+        <li>Carol Dweck — <em>Mindset</em></li>
+        <li>Martin Seligman — <em>Educar para o Optimismo</em></li>
+      </ul>
+    `
+  },
+
+  post16: {
+    title: "Ser autónomo… estando num centro de estudos?",
+    date: "4 de dezembro de 2024",
+    cats: [],
+    img: "https://3ponto14.com/wp-content/uploads/2024/11/istock-586379824_custom-31aa5fe9e1126ecb0ec576fbb78b942c1f4e4f13-1024x683.jpg",
+    url: "https://3ponto14.com/autonomia-centro-estudos/",
+    content: `
+      <p>Frequentar um centro de estudos reduz a independência das crianças — ou pode, pelo contrário, fomentá-la? A resposta pode surpreender.</p>
+
+      <p>Investigação recente da OCDE indica que alunos mais autónomos obtêm tipicamente melhores resultados académicos. E um bom centro de estudos trabalha precisamente para desenvolver essa capacidade de decisão e gestão do tempo.</p>
+
+      <h2>Cinco Estratégias para Fomentar a Autonomia</h2>
+      <ul>
+        <li><strong>Trabalho de grupo:</strong> a aprendizagem colaborativa desenvolve a partilha de ideias e a capacidade de resolver problemas em equipa.</li>
+        <li><strong>Gestão do tempo:</strong> ajudar os alunos a criar horários semanais desenvolve competências de organização.</li>
+        <li><strong>Celebrar o esforço:</strong> o reconhecimento do empenho e do progresso constrói confiança além das notas.</li>
+        <li><strong>Resolução guiada de problemas:</strong> usar técnicas de questionamento em vez de dar respostas diretas promove o pensamento independente.</li>
+        <li><strong>Reencadrar os erros:</strong> criar ambientes onde os erros são oportunidades de aprendizagem desenvolve resiliência.</li>
+      </ul>
+
+      <h2>Leituras Complementares</h2>
+      <ul>
+        <li><em>The Role of Self-Regulated Learning in Academic Success</em></li>
+        <li>OCDE — <em>Education at a Glance 2023</em></li>
+        <li>Carol Dweck — <em>Mindset</em></li>
+        <li>Donald Martin — <em>How to Be a Successful Student</em></li>
+      </ul>
+    `
+  },
+
+  post17: {
+    title: "A nossa equipa",
+    date: "26 de novembro de 2024",
+    cats: [],
+    img: "",
+    url: "https://3ponto14.com/quem-somos_/",
+    content: `
+      <p>O 3ponto14 nasceu da união de experiências profissionais e valores partilhados entre as fundadoras Ana e Joana. O que as une é o alinhamento de valores e o compromisso com o sucesso dos alunos através de um acompanhamento genuíno.</p>
+
+      <h2>Onde Estamos</h2>
+      <ul>
+        <li><strong>Presencial:</strong> Rio Tinto, Portugal</li>
+        <li><strong>Online:</strong> Portugal Continental, Ilhas e Angola</li>
+      </ul>
+
+      <h2>O que Oferecemos</h2>
+      <ul>
+        <li>Apoio ao estudo ilimitado</li>
+        <li>Explicações individuais</li>
+        <li>Explicações em grupo (máx. 4 alunos)</li>
+        <li>Programas de homeschooling</li>
+        <li>Workshops para educadores e pais</li>
+        <li>Consultas psicopedagógicas</li>
+      </ul>
+
+      <h2>A Nossa Equipa de Professores</h2>
+      <p>Contamos com educadores para todos os níveis de ensino (1.º ao 12.º ano e ensino superior), disponíveis online e presencialmente.</p>
+
+      <h2>Contacto</h2>
+      <p>
+        Email: <a href="mailto:3ponto14edu@gmail.com">3ponto14edu@gmail.com</a><br/>
+        Telefone: +351 912 381 996<br/>
+        Morada: R. dos Bombeiros Voluntários de Areosa 142, 4435-510 Rio Tinto
+      </p>
+    `
+  }
+
+};
+
+// ── Open / close logic ──
+function openPost(id) {
+  const p = posts[id];
+  if (!p) return;
+
+  const imgHtml = p.img
+    ? `<img src="${p.img}" alt="${p.title}" class="post-modal__hero-img" />`
+    : '';
+
+  const catsHtml = p.cats.map(c => `<span class="post-modal__cat">${c}</span>`).join('');
+
+  document.getElementById('post-modal__inner').innerHTML = `
+    ${imgHtml}
+    <div class="post-modal__meta">
+      <span class="post-modal__date">${p.date}</span>
+      ${catsHtml}
+    </div>
+    <h1>${p.title}</h1>
+    <div class="post-modal__content">${p.content}</div>
+    <a href="${p.url}" target="_blank" rel="noopener" class="post-modal__source">Ver artigo original em 3ponto14.com ↗</a>
+  `;
+
+  const overlay = document.getElementById('post-overlay');
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePost() {
+  document.getElementById('post-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closePostOnBg(e) {
+  if (e.target === document.getElementById('post-overlay')) closePost();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePost();
+});
+</script>
+
+</body>
+</html>
