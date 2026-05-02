@@ -220,66 +220,98 @@
   <!-- SERVIÇOS -->
   <section class="servicos" id="servicos">
     <div class="container">
-      <div class="section-head centered">
+      <div class="section-head">
         <p class="section-tag">O que fazemos</p>
         <h2 class="section-title">Os nossos <em>serviços</em></h2>
       </div>
-      <div class="servicos-grid">
+      <div class="servicos-tabs">
 
-        <div class="servico-card">
-          <div class="servico-card-img">
-            <img src="fotos centro/Centro de Estudos 3Ponto14-5.jpg" alt="Apoio ao Estudo" />
-          </div>
-          <div class="servico-card-body">
-            <div class="servico-pill">Online &amp; Presencial</div>
-            <h3>Apoio ao Estudo</h3>
-            <p>Acompanhamento regular e personalizado do 1º ao 12º ano. O aluno tem um espaço para estudar, tirar dúvidas e organizar o trabalho escolar — com apoio de professores especializados.</p>
-            <ul class="servico-lista">
-              <li>1º ao 12º ano</li>
-              <li>Todas as disciplinas</li>
-              <li>Online e presencial</li>
-              <li>Horários flexíveis</li>
-            </ul>
-            <a href="#contacto" class="link-arrow">Saber mais <span>→</span></a>
-          </div>
+        <!-- Menu -->
+        <div class="tabs-menu">
+          <button class="tab-btn active" data-tab="apoio">
+            <span class="tab-num">01</span>
+            <div class="tab-btn-text">
+              <strong>Apoio ao Estudo</strong>
+              <span>Online &amp; Presencial</span>
+            </div>
+            <svg class="tab-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button class="tab-btn" data-tab="explicacoes">
+            <span class="tab-num">02</span>
+            <div class="tab-btn-text">
+              <strong>Explicações Individuais</strong>
+              <span>Online &amp; Presencial</span>
+            </div>
+            <svg class="tab-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button class="tab-btn" data-tab="workshops">
+            <span class="tab-num">03</span>
+            <div class="tab-btn-text">
+              <strong>Workshops</strong>
+              <span>Gratuito · Comunidade</span>
+            </div>
+            <svg class="tab-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
         </div>
 
-        <div class="servico-card">
-          <div class="servico-card-img">
-            <img src="fotos centro/Centro de Estudos 3Ponto14-60.jpg" alt="Explicações Individuais" />
-          </div>
-          <div class="servico-card-body">
-            <div class="servico-pill">Online &amp; Presencial</div>
-            <h3>Explicações Individuais</h3>
-            <p>Aulas a dois, focadas nas necessidades específicas de cada aluno. Ideais para preparação de testes, exames nacionais ou para consolidar matérias mais difíceis.</p>
-            <ul class="servico-lista">
-              <li>1º ao 12º ano</li>
-              <li>Qualquer disciplina</li>
-              <li>Ritmo do aluno</li>
-              <li>Marcação flexível</li>
-            </ul>
-            <a href="#contacto" class="link-arrow">Saber mais <span>→</span></a>
-          </div>
-        </div>
+        <!-- Conteúdo -->
+        <div class="tabs-content">
 
-        <div class="servico-card servico-card-destaque">
-          <div class="servico-card-img">
-            <img src="fotos centro/Centro de Estudos 3Ponto14-40.jpg" alt="Workshops" />
+          <div class="tab-panel active" id="tab-apoio">
+            <div class="tab-img">
+              <img src="fotos centro/Centro de Estudos 3Ponto14-5.jpg" alt="Apoio ao Estudo" />
+              <div class="tab-img-badge">Online &amp; Presencial</div>
+            </div>
+            <div class="tab-info">
+              <h3>Apoio ao Estudo</h3>
+              <p>Um espaço onde o aluno estuda, organiza o trabalho escolar e tira dúvidas — com professores especializados sempre disponíveis. Do 1º ao 12º ano, em todas as disciplinas.</p>
+              <div class="tab-tags">
+                <span>1º ao 12º ano</span>
+                <span>Todas as disciplinas</span>
+                <span>Horários flexíveis</span>
+                <span>Online &amp; Presencial</span>
+              </div>
+              <a href="#contacto" class="btn-primary">Quero saber mais</a>
+            </div>
           </div>
-          <div class="servico-card-body">
-            <div class="servico-pill pill-blush">Gratuito</div>
-            <h3>Workshops</h3>
-            <p>Sessões abertas a toda a comunidade, sem qualquer custo. Temas ligados ao estudo, bem-estar, inteligência emocional e desenvolvimento pessoal — para alunos e famílias.</p>
-            <ul class="servico-lista">
-              <li>Aberto a toda a comunidade</li>
-              <li>Totalmente gratuito</li>
-              <li>Temas variados</li>
-              <li>Mensalmente</li>
-            </ul>
-            <a href="#contacto" class="link-arrow">Ver próximo workshop <span>→</span></a>
-          </div>
-        </div>
 
+          <div class="tab-panel" id="tab-explicacoes">
+            <div class="tab-img">
+              <img src="fotos centro/Centro de Estudos 3Ponto14-60.jpg" alt="Explicações Individuais" />
+              <div class="tab-img-badge">Online &amp; Presencial</div>
+            </div>
+            <div class="tab-info">
+              <h3>Explicações Individuais</h3>
+              <p>Aulas a dois, 100% focadas no aluno. Ideais para preparação de testes e exames nacionais, consolidar matérias difíceis ou avançar ao próprio ritmo — sem distrações.</p>
+              <div class="tab-tags">
+                <span>1º ao 12º ano</span>
+                <span>Qualquer disciplina</span>
+                <span>Ritmo próprio</span>
+                <span>Marcação flexível</span>
+              </div>
+              <a href="#contacto" class="btn-primary">Quero saber mais</a>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-workshops">
+            <div class="tab-img">
+              <img src="fotos centro/Centro de Estudos 3Ponto14-40.jpg" alt="Workshops" />
+              <div class="tab-img-badge badge-blush">Gratuito</div>
+            </div>
+            <div class="tab-info">
+              <h3>Workshops</h3>
+              <p>Sessões abertas a toda a comunidade, sem qualquer custo. Temas ligados ao estudo, bem-estar, inteligência emocional e desenvolvimento pessoal — para alunos e famílias.</p>
+              <div class="tab-tags">
+                <span>Toda a comunidade</span>
+                <span>Totalmente gratuito</span>
+                <span>Temas variados</span>
+                <span>Mensalmente</span>
+              </div>
+              <a href="#contacto" class="btn-primary">Ver próximo workshop</a>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </section>
