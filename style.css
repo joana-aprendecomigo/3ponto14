@@ -714,6 +714,104 @@ img { display: block; max-width: 100%; }
 }
 .servico-item:hover .servico-img img { transform: scale(1.05); }
 
+/* ============ SERVIÇOS ============ */
+.servicos { padding: 120px 0; background: var(--white); }
+
+.servicos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.servico-card {
+  background: var(--cream);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s;
+}
+.servico-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+}
+.servico-card-destaque { background: var(--green-pale); }
+
+.servico-card-img {
+  width: 100%;
+  aspect-ratio: 3/2;
+  overflow: hidden;
+  background: var(--green-pale);
+}
+.servico-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+.servico-card:hover .servico-card-img img { transform: scale(1.05); }
+
+.servico-card-body { padding: 28px; }
+
+.servico-pill {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: var(--white);
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+.pill-blush {
+  color: var(--blush-mid);
+  background: var(--white);
+}
+
+.servico-card h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.servico-card p {
+  font-size: 0.88rem;
+  color: var(--gray);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.servico-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.servico-lista li {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.servico-lista li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .servicos-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+}
+
 /* ============ EQUIPA ============ */
 .equipa { padding: 120px 0; background: var(--cream); }
 
