@@ -210,9 +210,81 @@ img { display: block; max-width: 100%; }
 }
 
 .logo { display: flex; align-items: center; flex-shrink: 0; }
-.logo-img { height: 40px; width: auto; object-fit: contain; }
-.logo-text { font-size: 1.7rem; font-weight: 900; color: var(--white); }
-.logo-text .dot { color: var(--blush); }
+
+/* ── Logo SVG animado ── */
+.logo-svg-wrap {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  line-height: 1;
+  gap: 0;
+}
+
+.logo-char {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 2.05rem;
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: logoCharIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation-delay: var(--d, 0s);
+  letter-spacing: -0.01em;
+}
+
+@keyframes logoCharIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* the span that holds the circle svg instead of an 'o' */
+.logo-o-special {
+  position: relative;
+  width: 1.18em;
+  justify-content: center;
+  overflow: visible;
+}
+
+.logo-circle-svg {
+  width: 1.22em;
+  height: 1.22em;
+  display: block;
+  overflow: visible;
+}
+
+.circle-spin {
+  transform-origin: 40px 40px;
+  animation: spinCircle 14s linear infinite;
+}
+
+@keyframes spinCircle {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* navbar hover — circle speeds up */
+.logo:hover .circle-spin {
+  animation-duration: 4s;
+}
+
+/* footer logo — smaller, no entry animation delay */
+.footer-logo-svg {
+  height: 36px;
+  margin-bottom: 16px;
+}
+.footer-logo-svg .logo-char {
+  font-size: 1.7rem;
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+.footer-tagline {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.04em;
+  margin-bottom: 28px;
+}
 
 .nav-links {
   display: flex;
@@ -901,9 +973,6 @@ img { display: block; max-width: 100%; }
   padding: 80px 40px 64px;
 }
 
-.footer-logo { height: 44px; width: auto; margin-bottom: 16px; }
-.footer-logo-text { font-size: 1.8rem; font-weight: 900; color: var(--white); margin-bottom: 16px; display: block; }
-.footer-logo-text .dot { color: var(--blush); }
 
 .footer-brand p {
   font-size: 0.88rem;
