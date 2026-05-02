@@ -717,12 +717,52 @@ img { display: block; max-width: 100%; }
 /* ============ EQUIPA ============ */
 .equipa { padding: 120px 0; background: var(--cream); }
 
-.equipa-grid {
+.equipa-fundadoras {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 28px;
-  align-items: start;
-  grid-template-rows: auto auto;
+  max-width: 720px;
+  margin: 0 auto 56px;
+}
+
+.equipa-numero {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  background: var(--green);
+  border-radius: 24px;
+  padding: 48px 56px;
+}
+
+.equipa-num-destaque {
+  font-size: 6rem;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: -0.04em;
+}
+
+.equipa-num-texto strong {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.equipa-num-texto p {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  max-width: 480px;
+}
+
+@media (max-width: 900px) {
+  .equipa-fundadoras { grid-template-columns: 1fr; max-width: 420px; }
+  .equipa-numero { flex-direction: column; text-align: center; padding: 40px 32px; gap: 20px; }
 }
 
 .equipa-card {
